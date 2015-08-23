@@ -38,8 +38,8 @@ level1Complete <- union(testCombined, trainCombined)
 
 ## for part 2, I subset the full dataset for feature lables containing 'mean' 
 ## or 'std' then examine the resulting columns matching the criteria. 
-cols <- as.array(colnames(level1Complete))
 step2 <- level1Complete[,grep("mean|std", colnames(level1Complete))]
+colnames(step2)
 
 ## Add back the activity ID and Subject ID columns.
 ## Subset the column names to replace with their corresponding activity label
@@ -65,11 +65,13 @@ revisedStep3 <- revisedStep3[,c(1:2,w+1,3:w)]
 
 colnames(revisedStep3) 
 
+# Create tidy data table with average variable values grouped by subject and activity
 tidyData <- revisedStep3 %>%
    group_by(subject,activityId,activityLabels) %>%
       summarise_each(funs(mean))
 
-write.table(tidyData, "./tidy-data.txt", sep=",", row.name=FALSE)
+# Write to txt file
+write.table(tidyData, "./tidy-data.txt", sep="\t", row.name=FALSE)
 
 # More housekeeping
-rm(w, cols, sub3, activityLabels)
+rm(w, cols, sub3, activityLabels, step3)
