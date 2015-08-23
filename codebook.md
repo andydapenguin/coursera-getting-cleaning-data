@@ -20,11 +20,16 @@ The sensor signals of the accelerometer and gyroscope were pre-processed by appl
 The sensor acceleration signal, which has gravitational and body motion components, was separated using a Butterworth low-pass filter into body acceleration and gravity. The gravitational force is assumed to have only low frequency components, therefore a filter with 0.3 Hz cutoff frequency was used.
 
 ##Creating the tidy datafile
+
 ###Guide to creating the tidy data file
-To create the tidy datafile, we perform the steps assigned in the project description: first to download the data from the UCI link provided (). Then we merge the training and test data sets together with the activity IDs and subject numbers. This comprehensive raw data set is then applied the variable names from the ‘features.txt’ file supplied with the raw data. Then we filter the data set for columns containing Mean or Std (deviation) to perform final analyses.
+To create the tidy datafile, we perform the steps assigned in the project description: first to download the data from the [UCI link provided](http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones). Then we merge the training and test data sets together with the activity IDs and subject numbers. This comprehensive raw data set is then applied the variable names from the ‘features.txt’ file supplied with the raw data. Then we filter the data set for columns containing Mean or Std (deviation) to perform final analyses.
 
 ###Cleaning of the data
-Short high-level desc of the script's cleaning performance
+Though the script run_analysis.R contains some high-level markup and comments, I will also provide a brief description of the workflow here. First, we load the feature labels and clean up the naming conventions to remove extemporaneous characters. Then we load the test and training raw data, then load the subject data for test and training subjects, and finally we load the activity ID data for test and training data.
+
+Then we merged all testing data together and all training together, then merged both sets together. In the next step, I subset this merged dataset for features with mean or std in the feature name, excluding mean frequency data. This is to enable focus on the subject movement data and not the recording frequency data. Then I add back in the subject and activity IDs. Then I create a new column for a more readable activity label.
+
+Finally, we create our tidy dataset by grouping our data to the subject and activity label dimensions (using group_by), and summarize each feature (summarise_each) with the single function of mean(). Last we write this tidy data set to a text file.
 
 ##Description of variables in the final file
 The first three variables in the final file are the subject (1-30), the activity label (walking, walking_upstairs, walking_downstairs, sitting, standing or laying) and the activity ID corresponding to the activity label as described in the activity_labels.txt file in the original data set.
