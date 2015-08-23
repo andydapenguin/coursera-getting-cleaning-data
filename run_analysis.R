@@ -3,14 +3,16 @@ install.packages('dplyr')
 library(dplyr)
 
 # locate data
-setwd("C:/Users/bmoore/Box Sync/Brian Moore/Challenge/UCI HAR Dataset")
+getwd()
+setwd("./Box Sync/Brian Moore/Challenge/UCI HAR Dataset")
 
-# load features to workspace, remove first col & transform to character vector
+# load features to workspace, remove first col & clean as.character vector
 features <- read.table('./features.txt', col.names=c("rowNumber","varName"))
 features <- tbl_df(features) %>%
    select(varName)
 
 vector <- as.character(features$varName)
+vector <- gsub("-|\\(\\)-", "", vector, perl = TRUE)
 class(vector)        ## QA the data type of the transformed variable names
 
 # load test & train data to the workspace, applying column headers
@@ -37,13 +39,14 @@ level1Complete <- union(testCombined, trainCombined)
      testCombined, trainCombined)
 
 ## for part 2, I subset the full dataset for feature lables containing 'mean' 
-## or 'std' then examine the resulting columns matching the criteria. 
-step2 <- level1Complete[,grep("mean|std", colnames(level1Complete))]
+## or 'std' at the end of the feature name then examine the resulting columns 
+## matching the criteria. 
+step2 <- level1Complete[,grep("(mean|std)[XYZ]", colnames(level1Complete))]
 colnames(step2)
 
 ## Add back the activity ID and Subject ID columns.
 ## Subset the column names to replace with their corresponding activity label
-step3 <- level1Complete[,grep("mean|std|activityId|subject", colnames(level1Complete))]
+step3 <- level1Complete[,grep("(mean|std)[XYZ]|activityId|subject", colnames(level1Complete))]
 cols <- as.array(colnames(step3))
 class(cols)
 
@@ -58,20 +61,21 @@ activityLabels <- sub("6", "laying", activityLabels )
 activityLabels <- as.data.frame(activityLabels)
 
 ## Re-arrange columns after substituting activity IDs with activityLabels
-## leaving our feature names as the final columns of the data frame
+## leaving our feature names as the right-most columns of the data frame
 revisedStep3 <- bind_cols(step3, activityLabels)
 w <- ncol(revisedStep3) - 1
 revisedStep3 <- revisedStep3[,c(1:2,w+1,3:w)]
 
-colnames(revisedStep3) 
+colnames(revisedStep3)
 
 # Create tidy data table with average variable values grouped by subject and activity
 tidyData <- revisedStep3 %>%
-   group_by(subject,activityId,activityLabels) %>%
+   group_by(subject,activityLabels) %>%
       summarise_each(funs(mean))
 
 # Write to txt file
-write.table(tidyData, "./tidy-data.txt", sep="\t", row.name=FALSE)
+write.table(tidyData, "./tidy_data.txt", sep="\t", row.name=FALSE)
 
 # More housekeeping
-rm(w, cols, sub3, activityLabels, step3)
+rm(w, cols, sub3, activityLabels, step3, step2, revisedStep3)
+
